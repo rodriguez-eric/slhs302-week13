@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hearing Lab · SLHS 302</title>
+<style>
+:root{font:17px/1.55 system-ui,sans-serif;color:#172c31;background:#f5f3ea;--teal:#085d57;--line:#cbd4ca}
+*{box-sizing:border-box}body{margin:0}a{color:var(--teal)}button,select,input{font:inherit}button,select{border:1px solid var(--teal);border-radius:.45rem;padding:.45rem .74rem;background:white;color:var(--teal)}button{cursor:pointer}button:hover{background:#daece6}button.primary{background:var(--teal);color:white}button:disabled{opacity:.55;cursor:default}:focus-visible{outline:3px solid #a74617;outline-offset:3px}
+header{background:#123a3a;color:#fff;padding:3rem max(5vw,calc((100vw - 1100px)/2)) 2rem}header p{max-width:44rem}h1,h2,h3{line-height:1.15}h1{font:clamp(3rem,8vw,6.3rem)/.97 Georgia,serif;margin:.5rem 0 1rem}h2{font:clamp(2.1rem,5vw,3.4rem)/1 Georgia,serif;margin:0 0 1rem}h3{margin:0 0 .5rem}p{margin:.5rem 0 1rem}.course{color:#b7e6ce;font-weight:700;letter-spacing:.14em;font-size:.8rem}
+main,nav,footer{max-width:1100px;margin:auto;padding:1rem clamp(1rem,4vw,2rem)}nav{display:flex;gap:.5rem 1.2rem;flex-wrap:wrap}nav a{font-weight:650}section{scroll-margin-top:1rem;margin:2.4rem 0 4rem}article{background:#fff;border:1px solid var(--line);border-radius:.85rem;padding:clamp(1rem,3vw,1.7rem);margin:1rem 0}.intro{background:#e4eee5}.controls{display:flex;align-items:end;gap:.7rem;flex-wrap:wrap;margin:.8rem 0}.field{display:inline-flex;flex-direction:column;font-weight:650;gap:.2rem}.field input{max-width:100%;accent-color:var(--teal)}output{font-variant-numeric:tabular-nums}.feedback{display:block;min-height:1.6em;font-weight:650;color:#10554b}.feedback:empty{min-height:0}.note{font-size:.9rem;color:#475957}.video{width:min(100%,650px);aspect-ratio:16/9;border:0;display:block;margin:.8rem 0}canvas{display:block;width:min(100%,720px);height:auto;background:#f1f6f3;border:1px solid var(--line);border-radius:.5rem}.plot-key{display:flex;gap:1rem;flex-wrap:wrap}.checklist label{display:inline-block;margin-right:.8rem}.quiz{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line)}summary{cursor:pointer;color:var(--teal);font-weight:650}footer{border-top:1px solid var(--line)}[hidden]{display:none!important}
+.try{background:#eaf2eb;padding:.8rem 1rem;margin:1rem 0;border-left:4px solid #085d57}.try ol{margin:.4rem 0;padding-left:1.45rem}.try li{margin:.28rem 0}.try h4,.check h4{margin:0 0 .3rem}.check{margin-top:1rem;border-top:1px solid var(--line);padding-top:.8rem}.check p{margin:.35rem 0}.drag{touch-action:none;cursor:grab;max-width:480px}.drag:active{cursor:grabbing}.thresholds td,.thresholds th{padding:.35rem;text-align:left}.thresholds{border-collapse:collapse}.thresholds tr+tr{border-top:1px solid var(--line)}.field input[type=number]{width:8rem}</style>
+<header><div class="course">SLHS 302 · HEARING SCIENCE</div><h1>Hearing Lab</h1><p>Predict what you’ll hear, try the demo, and explain what changed.</p></header>
+<nav aria-label="Practice stations"><a href="#binaural">Binaural hearing</a><a href="#localization">Sound localization</a><a href="#loudness">Loudness</a><a href="#pitch">Pitch</a></nav>
+<main>
+<article class="intro"><h3>Set up your headphones</h3><p>Use stereo headphones at a comfortable volume. Start low. Use the channel check to confirm left and right, and turn off mono audio or spatial effects for the listening trials.</p><div class="controls"><button data-channel="left">Check left</button><button data-channel="right">Check right</button><button id="stop">Stop lab audio</button></div><output id="audio-status" class="feedback" aria-live="polite"></output><p class="note">Use the diagrams and written questions if you can’t listen. Audio level controls show relative changes.</p></article>
+<section id="binaural"><h2>Binaural hearing</h2>
+<article><h3>What reaches each ear?</h3><div class="try"><h4>Try This</h4><ol><li>Play Monotic and identify the active ear.</li><li>Play Diotic and notice whether both channels sound alike.</li><li>Play Dichotic and compare the pitches on the left and right. Read the channel descriptions to check your observations.</li></ol></div><p>Play each condition and inspect its two channels. Can one sound source produce different inputs at the ears?</p><div class="controls"><button data-condition="Monotic">Monotic</button><button data-condition="Diotic">Diotic</button><button data-condition="Dichotic">Dichotic</button></div><output id="condition" class="feedback" aria-live="polite"></output><div id="binaural-q"></div><div class="check"><h4>Check Your Understanding</h4><p>Could one real-world sound give the two ears different inputs?</p><details><summary>Reveal answer</summary><p>Yes. A bell off to one side can reach both ears at different times and levels.</p></details></div></article>
+<article><h3>Find the tone in noise</h3><div class="try"><h4>Try This</h4><ol><li>Play Noise alone to learn what the masker sounds like.</li><li>At −15 dB, play In-phase tone and then Opposite-phase tone. Compare the tone traces.</li><li>Lower the tone setting a few dB at a time. At each setting, compare both conditions before moving the slider again. Note which tone you can follow at a lower level.</li></ol></div><p>Keep the masker identical at both ears. At a fixed signal setting, compare an in-phase 500 Hz tone with the same tone reversed in one ear.</p><label class="field">Tone relative to noise RMS (dB)<input id="snr" type="range" min="-28" max="0" value="-15"><output id="snr-value"></output></label><div class="controls"><button id="noise">Noise alone</button><button id="inphase">In-phase tone</button><button id="opposite">Opposite-phase tone</button></div><p class="note">Try lowering the tone gradually. This comparison is a demonstration. Listening informally does not establish a detection threshold.</p><p class="note">Schematic traces show each component separately.</p><canvas id="phase-plot" width="720" height="300" role="img" aria-label="Separate tone waveforms and shared masker waveform"></canvas><output id="phase-status" class="feedback" aria-live="polite"></output><div class="check"><h4>Check Your Understanding</h4><p>What changes when the right-ear tone flips, and why can that lower threshold?</p><details><summary>Reveal answer</summary><p>The right tone’s peaks become troughs, while the noise waveform and the tone level at each ear stay fixed. The resulting difference between the ears can help the auditory system separate the tone from the masker.</p></details></div></article>
+<article><h3>Calculate the BMLD</h3><div class="try"><h4>Try This</h4><ol><li>Read the two masked thresholds in the table.</li><li>Subtract the opposite-phase threshold from the in-phase threshold.</li><li>Enter the difference in dB, then say what it tells you about detection.</li></ol></div>
+<p>A masked threshold is the lowest tone level a listener can detect reliably in noise under a specified test condition. These are example results at the same masker level.</p>
+<table class="thresholds"><thead><tr><th scope="col">Condition</th><th scope="col">Masked threshold</th></tr></thead><tbody><tr><td>In-phase tone (M₀S₀)</td><td>52 dB SPL</td></tr><tr><td>Opposite-phase tone (M₀Sπ)</td><td>41 dB SPL</td></tr></tbody></table>
+<form id="bmld-form" class="controls"><label class="field">Threshold difference (dB)<input id="bmld-answer" type="number" step="any" required></label><button>Check calculation</button></form><output id="bmld-result" class="feedback" aria-live="polite"></output><div class="check"><h4>Check Your Understanding</h4><p>What does the BMLD mean in this example?</p><details><summary>Reveal answer</summary><p>52 − 41 = 11 dB. The listener detected the opposite-phase tone at a level 11 dB lower with the same masker.</p></details></div></article>
+<article><h3>Virtual Barber Shop</h3><div class="try"><h4>Try This</h4><ol><li>Put on stereo headphones and load the video or open the YouTube link.</li><li>Listen for the scissors, clippers, and voices. Write down a moment that seems to move sideways and a moment that seems to get closer or pass behind you.</li><li>Replay one moment and describe the cues that could give you that impression.</li></ol></div><p>Use headphones and listen for the scissors, clippers, and voices. Which sounds seemed to cross from one side to the other, come from behind, or get closer?</p><div class="controls"><button id="video">Load video</button><a href="https://www.youtube.com/watch?v=IUDTlvagjJA" target="_blank" rel="noopener">Watch on YouTube</a></div><div id="video-slot"></div><p class="note">Binaural audio by <a href="https://www.qsound.com/demos/baks/binaural-audio.1013">QSound Labs</a>.</p><details><summary>Discuss what you heard</summary><p>Left–right movement can change both interaural timing and level. Front–back judgments can also use direction-dependent spectral cues. A sound growing louder can suggest approach if its source level is stable.</p></details><div class="check"><h4>Check Your Understanding</h4><p>What cues could make a sound seem to move around you?</p><details><summary>Reveal answer</summary><p>Timing and level differences can signal side-to-side movement. Changes in the spectrum can help with front–back judgments, and rising level can suggest approach if the source level stays steady.</p></details></div></article>
+</section>
+<section id="localization"><h2>Sound localization</h2>
+
+<article><h3>Drag a sound source around the listener</h3><div class="try"><h4>Try This</h4><ol><li>Start the loop at 0°. Drag the dot using a mouse or finger, or use the azimuth slider.</li><li>Move to +90°, then to −90°. Listen for which side is favored and read which ear leads and is louder.</li><li>Compare 0° with 180°. Stop the loop when finished.</li></ol></div>
+<canvas class="drag" id="azimuth-map" width="480" height="380" role="img" aria-label="Top view of a listener and a movable source"></canvas>
+<div class="controls"><label class="field">Azimuth (degrees)<input id="orbit-angle" type="range" min="-180" max="180" value="0"></label><button class="primary" id="orbit-start">Start looping sound</button><button id="orbit-stop">Stop looping sound</button></div><output id="orbit-result" class="feedback" aria-live="polite"></output>
+<p class="note">This model changes timing and level in both headphone channels. Front and back can sound similar because the model uses horizontal binaural cues.</p><div class="check"><h4>Check Your Understanding</h4><p>Why can 0° and 180° sound alike in this model?</p><details><summary>Reveal answer</summary><p>Both are on the midline and produce equal timing and level at the two ears in this model. Real listeners can also use pinna filtering and changes caused by head movement.</p></details></div></article>
+<article><h3>Front or back?</h3><div class="try"><h4>Try This</h4><ol><li>Set Head turn to 0°. Play the front and rear candidates and compare the readouts.</li><li>Turn the head to +45° and play both again. Note which ear leads for each candidate.</li><li>Repeat with a leftward turn and compare the pattern.</li></ol></div><p>A source directly ahead and a source directly behind can give similar interaural cues while the listener faces forward. Rotate the head to compare two hypothetical sources, one at a time.</p><label class="field">Head turn (degrees)<input id="turn" type="range" min="-70" max="70" value="0"><output id="turn-value"></output></label><canvas id="head" width="720" height="265" role="img" aria-label="Head orientation relative to front and rear sources"></canvas><output id="front-back" class="feedback" aria-live="polite"></output><div class="controls"><button id="front">Play front candidate</button><button id="back">Play rear candidate</button></div><p class="note">Playback represents the resulting horizontal cues. The diagram shows why the cues diverge after a head turn.</p><div class="check"><h4>Check Your Understanding</h4><p>How does turning your head help?</p><details><summary>Reveal answer</summary><p>The front and rear candidates start with similar cues. After a turn, their timing differences favor opposite ears.</p></details></div></article>
+<article><h3>Hear what minimum audible angle means</h3>
+<div class="try"><h4>Try This</h4><ol>
+<li>Start at 30° and select <strong>Play pair</strong>. The first sound is straight ahead at 0°. Choose whether the second sound moved left or right.</li>
+<li>Read the feedback and select <strong>Next angle</strong> to try 10°, then 3°. You can replay the pair before answering.</li>
+<li>Which separation felt hardest? Think about how the difference between the two sounds changed as they moved closer together.</li>
+</ol></div>
+<div class="controls"><button id="maa-play">Play pair</button><button id="maa-left" disabled>Second moved left</button><button id="maa-right" disabled>Second moved right</button><button id="maa-next" disabled>Next angle</button></div>
+<output id="maa-status" class="feedback" aria-live="polite"></output>
+<div class="check"><h4>Check Your Understanding</h4><p>What does a smaller minimum audible angle mean?</p><details><summary>Reveal answer</summary><p>The listener can reliably tell apart sounds that are closer together in direction.</p></details></div></article>
+<article><h3>Localization challenge</h3>
+<div class="try"><h4>Try This</h4><ol><li>Put on stereo headphones and select Play trial audio.</li><li>Choose Left, Center, or Right based on where you heard the tone.</li><li>Read the feedback, then continue to the next listening trial.</li></ol></div>
+<div id="challenge"></div></article>
+</section>
+<section id="loudness"><h2>Loudness</h2>
+<article><h3>Match two tones</h3><div class="try"><h4>Try This</h4><ol><li>Choose 250 Hz and play the pair. The 1,000 Hz reference plays first.</li><li>Start with the comparison soft and raise it until the tones sound equally loud. Record the setting.</li><li>Start again with the comparison loud and lower it until they match. Compare the two settings, then try 4,000 Hz.</li></ol></div><p>Compare a 1,000 Hz reference with a 250 Hz or 4,000 Hz tone. Adjust the comparison until the two sound equally loud to you.</p><div class="controls"><label class="field">Comparison frequency<select id="match-freq"><option value="250">250 Hz</option><option value="4000">4,000 Hz</option></select></label><label class="field">Comparison level relative to reference (dB)<input id="match" type="range" min="-20" max="16" value="-4"><output id="match-value"></output></label><button id="match-play">Play pair</button></div><p class="note">The reference plays first. Matches depend on your headphones and playback level. The slider shows a digital level difference, relative to the reference.</p><div class="check"><h4>Check Your Understanding</h4><p>What are you holding equal in this task?</p><details><summary>Reveal answer</summary><p>Perceived loudness. Two tones at different frequencies can require different playback levels to sound equally loud.</p></details></div></article>
+<article><h3>Scale perceived loudness</h3><div class="try"><h4>Try This</h4><ol><li>Play the reference and imagine its loudness is 10.</li><li>Listen to each comparison. Enter a number for how loud it seems relative to 10, then record it.</li><li>After all three, compare your ratings with the revealed playback levels.</li></ol></div><p>Give the reference tone a loudness rating of 10. A sound that seems half as loud gets 5, and one that seems twice as loud gets 20.</p>
+<form id="scale-form" class="controls"><button type="button" id="scale-reference">Play reference</button><button type="button" id="scale-play">Play comparison A</button><label class="field">Loudness rating<input id="scale-rating" type="number" min="0" step="any" required></label><button id="scale-submit">Record rating</button><button type="button" id="scale-reset">Start over</button></form>
+<output id="scale-status" class="feedback" aria-live="polite"></output><div id="scale-results"></div><div class="check"><h4>Check Your Understanding</h4><p>What does giving a tone a rating of 20 mean here?</p><details><summary>Reveal answer</summary><p>It seemed twice as loud as the reference. The rating is a perceptual judgment rather than a dB value.</p></details></div></article>
+</section>
+<section id="pitch"><h2>Pitch</h2>
+<article><h3>Match a hidden pitch</h3><div class="try"><h4>Try This</h4><ol><li>Play the pair. The hidden reference plays first.</li><li>Adjust the comparison frequency until the two pitches sound as close as possible. Replay between adjustments.</li><li>Submit to reveal the reference and your error in Hz. Try another reference.</li></ol></div>
+<div class="controls"><button id="hidden-pair">Play reference then comparison</button><label class="field">Comparison frequency (Hz)<input id="hidden-hz" type="range" min="150" max="850" value="400"></label><output id="hidden-value"></output><button id="hidden-check">Submit match</button><button id="hidden-next">New reference</button></div><output id="hidden-result" class="feedback" aria-live="polite"></output><div class="check"><h4>Check Your Understanding</h4><p>If two tones match in pitch, must they also match in loudness?</p><details><summary>Reveal answer</summary><p>No. Pitch describes how high or low a sound seems. Loudness describes how strong it seems.</p></details></div></article>
+<article><h3>Remove the fundamental</h3>
+<div class="try"><h4>Try This</h4><ol><li>Play the sound with the 160 Hz fundamental and listen to its overall pitch.</li><li>Play the sound without the 160 Hz fundamental. Switch between the two and listen for what changes in the sound quality and whether the pitch stays similar.</li></ol></div>
+<div class="controls"><button id="with-f0">Play with the fundamental</button><button id="without-f0">Play without the fundamental</button></div>
+<div class="check"><h4>Check Your Understanding</h4><p>Why can you still hear a pitch near 160 Hz after that component is removed?</p><details><summary>Reveal answer</summary><p>The remaining 320, 480, and 640 Hz components are still spaced 160 Hz apart. Their combined waveform still repeats every 6.25 ms.</p></details></div></article>
+<article><h3>Look inside an auditory filter</h3><div class="try"><h4>Try This</h4><ol><li>Set the filter near 480 Hz and count the highlighted harmonics.</li><li>Move the filter near 3,200 Hz and count again.</li><li>Compare the filter widths and the spacing between adjacent harmonics.</li></ol></div><p>Move the filter across a 160 Hz harmonic series. Notice what happens as the illustrative filter bandwidth grows with center frequency.</p><label class="field">Filter center (Hz)<input id="filter-center" type="range" min="160" max="3840" step="40" value="480"><output id="filter-value"></output></label><canvas id="filter" width="720" height="235" role="img" aria-label="Auditory filter passband over a harmonic spectrum"></canvas><output id="filter-result" class="feedback" aria-live="polite"></output><details><summary>Why are higher harmonics harder to resolve?</summary><p>Neighboring harmonics stay 160 Hz apart. Higher-frequency auditory filters are wider in Hz, so several harmonics are more likely to fall within one passband.</p></details><div class="check"><h4>Check Your Understanding</h4><p>Why can several higher harmonics fall in the same filter?</p><details><summary>Reveal answer</summary><p>The harmonic spacing stays at 160 Hz in this example, while the auditory filters get wider in Hz at higher center frequencies.</p></details></div></article>
+</section>
+</main><footer>SLHS 302 · Hearing Science</footer>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const val = id => Number($(id).value);
+const show = (id, value) => { $(id).textContent = value; };
+const bind = (ids, update) => {
+  ids.forEach(id => $(id).addEventListener('input', update));
+  update();
+};
+const tone = (frequency, time) => Math.sin(2 * Math.PI * frequency * time);
+const db = value => 10 ** (value / 20);
+let audio;
+let playing;
+let orbit;
+
+// Generate two channels directly so level, polarity, and delay can be controlled independently.
+async function getAudio() {
+  const Context = window.AudioContext || window.webkitAudioContext;
+  if (!Context) throw new Error('This browser does not support lab audio.');
+  audio ??= new Context();
+  await audio.resume();
+  return audio;
+}
+
+async function renderAudio(duration, getSample) {
+  await getAudio();
+  stopAudio();
+  const rate = audio.sampleRate;
+  const buffer = audio.createBuffer(2, Math.ceil(duration * rate), rate);
+  const left = buffer.getChannelData(0);
+  const right = buffer.getChannelData(1);
+  for (let index = 0; index < left.length; index++) {
+    const [l, r] = getSample(index / rate, index);
+    left[index] = Math.max(-.24, Math.min(.24, l));
+    right[index] = Math.max(-.24, Math.min(.24, r));
+  }
+  const source = audio.createBufferSource();
+  source.buffer = buffer;
+  source.connect(audio.destination);
+  playing = source;
+  source.onended = () => { if (playing === source) playing = null; source.disconnect(); };
+  source.start();
+  return source;
+}
+
+function stopAudio() {
+  stopOrbit();
+  if (playing) {
+    if (maa?.source === playing) maa.source = null;
+    playing.stop();
+    playing = null;
+  }
+}
+$('stop').onclick = stopAudio;
+function audioButton(id, play) {
+  $(id).onclick = async () => {
+    show('audio-status', '');
+    try { await play(); }
+    catch (error) { show('audio-status', error.message || 'Audio could not play.'); }
+  };
+}
+
+function envelope(time, duration, ramp = .018) {
+  return Math.max(0, Math.min(1, time / ramp, (duration - time) / ramp));
+}
+function stereoTone(frequency, delay = 0, difference = 0, duration = .78) {
+  const leftDelay = Math.max(0, delay);
+  const rightDelay = Math.max(0, -delay);
+  const leftGain = db(-Math.max(0, difference));
+  const rightGain = db(Math.min(0, difference));
+  function channel(time, offset, gain) {
+    const shifted = time - offset;
+    return .095 * gain * envelope(shifted, duration) * tone(frequency, shifted);
+  }
+  return renderAudio(duration + .01, t => [channel(t, leftDelay, leftGain), channel(t, rightDelay, rightGain)]);
+}
+document.querySelectorAll('[data-channel]').forEach(button => {
+  button.onclick = async () => {
+    try {
+      await renderAudio(.6, time => {
+        const sample = .09 * envelope(time, .6) * tone(550, time);
+        return button.dataset.channel === 'left' ? [sample, 0] : [0, sample];
+      });
+      show('audio-status', 'Played in the ' + button.dataset.channel + ' channel.');
+    } catch (error) { show('audio-status', error.message); }
+  };
+});
+document.querySelectorAll('[data-condition]').forEach(button => {
+  const condition = button.dataset.condition;
+  button.onclick = async () => {
+    const text = {
+      Monotic: 'Left ear receives 500 Hz. Right ear is silent.',
+      Diotic: 'Both ears receive the same 500 Hz waveform.',
+      Dichotic: 'Left ear receives 500 Hz. Right ear receives 750 Hz.'
+    };
+    show('condition', text[condition]);
+    try {
+      await renderAudio(.7, t => {
+        const gain = .085 * envelope(t, .7);
+        return [gain * tone(500, t), condition === 'Monotic' ? 0 : gain * tone(condition === 'Diotic' ? 500 : 750, t)];
+      });
+    } catch (error) { show('audio-status', error.message); }
+  };
+});
+
+bind(['snr'], () => show('snr-value', val('snr') + ' dB'));
+function masking(polarity) {
+  const noiseRms = .043;
+  const signalPeak = noiseRms * Math.SQRT2 * db(val('snr'));
+  let seed = 20302;
+  return renderAudio(1.2, time => {
+    seed = (Math.imul(1664525, seed) + 1013904223) >>> 0;
+    const noise = (seed / 2147483648 - 1) * Math.sqrt(3) * noiseRms;
+    const signal = polarity === 0 ? 0 : signalPeak * tone(500, time);
+    const gain = envelope(time, 1.2);
+    return [gain * (noise + signal), gain * (noise + polarity * signal)];
+  });
+}
+audioButton('noise', () => { drawPhase(0); return masking(0); });
+audioButton('inphase', () => { drawPhase(1); return masking(1); });
+audioButton('opposite', () => { drawPhase(-1); return masking(-1); });
+
+$('video').onclick = () => {
+  stopAudio();
+  const frame = document.createElement('iframe');
+  frame.className = 'video';
+  frame.title = 'Virtual Barber Shop binaural audio demonstration';
+  frame.src = 'https://www.youtube-nocookie.com/embed/IUDTlvagjJA';
+  frame.referrerPolicy = 'strict-origin-when-cross-origin';
+  frame.allow = 'encrypted-media; picture-in-picture; fullscreen';
+  frame.allowFullscreen = true;
+  $('video-slot').replaceChildren(frame);
+  $('video').disabled = true;
+};
+
+function locationCues(angle, frequency) {
+  const side = Math.sin(angle * Math.PI / 180);
+  return { microseconds: Math.round(650 * side), level: Math.round((frequency < 1000 ? 2 : 14) * side * 10) / 10 };
+}
+const direction = number => number === 0 ? 'equal' : number > 0 ? 'right' : 'left';
+function canvas(id) {
+  const node = $(id);
+  const context = node.getContext('2d');
+  context.clearRect(0, 0, node.width, node.height);
+  context.font = '16px system-ui';
+  context.lineWidth = 2;
+  context.fillStyle = '#172c31';
+  return context;
+}
+function line(context, points, color) {
+  context.strokeStyle = color;
+  context.beginPath();
+  points.forEach(([x,y], i) => i ? context.lineTo(x,y) : context.moveTo(x,y));
+  context.stroke();
+}
+function point(context,x,y,color,r=6) {
+  context.fillStyle = color;
+  context.beginPath();
+  context.arc(x,y,r,0,2*Math.PI);
+  context.fill();
+  context.fillStyle = '#172c31';
+}
+function candidate(rear) {
+  return locationCues((rear ? 180 : 0) - val('turn'), 500).microseconds;
+}
+bind(['turn'], () => {
+  const angle = val('turn');
+  show('turn-value', angle + '°');
+  const ctx = canvas('head');
+  const t = angle * Math.PI / 180;
+  line(ctx,[[360,38],[360,226]],'#aabdb8');
+  point(ctx,360,51,'#085d57');
+  point(ctx,360,213,'#a74617');
+  ctx.fillText('Front source',379,56);
+  ctx.fillText('Rear source',379,219);
+  point(ctx,360,132,'#123a3a',35);
+  line(ctx,[[360,132],[360+57*Math.sin(t),132-57*Math.cos(t)]],'#70e0ba');
+  show('front-back', ['Front','Rear'].map((name,i) => {
+    const d = candidate(Boolean(i));
+    return name + ': ' + (d === 0 ? 'equal arrival times' : direction(d) + ' leads by ' + Math.abs(d) + ' µs');
+  }).join(' · '));
+});
+audioButton('front', () => stereoTone(500,candidate(false)/1e6));
+audioButton('back', () => stereoTone(500,candidate(true)/1e6));
+
+function question(target, prompt, options, correct, explanation, onAnswer) {
+  const quiz = document.createElement('div');
+  quiz.className = 'quiz';
+  const paragraph = document.createElement('p');
+  paragraph.textContent = prompt;
+  const controls = document.createElement('div');
+  controls.className = 'controls';
+  const feedback = document.createElement('output');
+  feedback.className = 'feedback';
+  feedback.setAttribute('aria-live','polite');
+  options.forEach((label,index) => {
+    const button = document.createElement('button');
+    button.textContent = label;
+    button.onclick = () => {
+      const right = index === correct;
+      feedback.textContent = (right ? 'Correct. ' : 'Answer: ' + options[correct] + '. ') + explanation;
+      if (onAnswer) {
+        [...controls.children].forEach(choice => { choice.disabled = true; });
+        onAnswer(right);
+      }
+    };
+    controls.append(button);
+  });
+  quiz.append(paragraph,controls,feedback);
+  target.append(quiz);
+}
+question($('binaural-q'),'A bicycle bell rings on your right. How would you typically classify the inputs at your two ears?',
+  ['Monotic','Diotic','Dichotic'],2,'Both ears receive the bell, but arrival time and level can differ.');
+
+
+const sides = ['Left','Center','Right'];
+const trials = [
+  {sound:[500,-420,0],prompt:'Which side does the tone favor?',options:sides,key:0,why:'The low-frequency tone leads at the left ear.'},
+  {sound:[4000,0,9],prompt:'Which side does the tone favor?',options:sides,key:2,why:'The right ear receives the higher level.'},
+  {sound:[500,0,0],prompt:'Where does the tone tend to lateralize?',options:sides,key:1,why:'Both ears receive identical timing and level.'},
+];
+let trialIndex = 0;
+let score = 0;
+function challengeButton(label, action) {
+  const button = document.createElement('button');
+  button.textContent = label;
+  button.onclick = action;
+  return button;
+}
+function renderTrial() {
+  const panel = $('challenge');
+  panel.replaceChildren();
+  const trial = trials[trialIndex];
+  const status = document.createElement('p');
+  status.setAttribute('aria-live','polite');
+  panel.append(status);
+  if (!trial) {
+    status.textContent = 'Score: ' + score + ' / ' + trials.length;
+    panel.append(challengeButton('Start again',() => {trialIndex=0;score=0;renderTrial();}));
+    return;
+  }
+  status.textContent = 'Trial ' + (trialIndex+1) + ' of ' + trials.length;
+  const [frequency, delay, level] = trial.sound;
+  const play = challengeButton('Play trial audio', async () => {
+    try { await stereoTone(frequency, delay/1e6, level); }
+    catch (error) { status.textContent = error.message; }
+  });
+  panel.append(play);
+  question(panel,trial.prompt,trial.options,trial.key,trial.why,right => {
+    score += Number(right);
+    const next = challengeButton(trialIndex === trials.length-1 ? 'See score' : 'Next trial',() => {
+      stopAudio();trialIndex++;renderTrial();panel.querySelector('button')?.focus();
+    });
+    panel.append(next);
+    next.focus();
+  });
+}
+renderTrial();
+
+bind(['match'], () => show('match-value', val('match') + ' dB'));
+audioButton('match-play', () => {
+  const gain = db(val('match'));
+  const frequency = val('match-freq');
+  return renderAudio(1.62, t => {
+    const second = t-.9;
+    const sample = .03 * (envelope(t,.65)*tone(1000,t) +
+      gain*envelope(second,.65)*tone(frequency,second));
+    return [sample,sample];
+  });
+});
+
+bind(['filter-center'], () => {
+  const center=val('filter-center');
+  const bandwidth=36+center*.13;
+  const low=center-bandwidth/2;
+  const high=center+bandwidth/2;
+  const ctx=canvas('filter');
+  const x=hz=>52+hz/4200*615;
+  ctx.fillStyle='#c5e6d5';
+  ctx.fillRect(x(low),38,x(high)-x(low),142);
+  ctx.fillStyle='#172c31';
+  line(ctx,[[52,180],[667,180]],'#819995');
+  const parts=Array.from({length:25},(_,i)=>(i+1)*160);
+  parts.forEach(hz=>line(ctx,[[x(hz),180],[x(hz),84]],hz>=low&&hz<=high?'#a74617':'#085d57'));
+  [0,1000,2000,3000,4000].forEach(hz=>ctx.fillText(hz+' Hz',x(hz)-10,211));
+  const inside=parts.filter(hz=>hz>=low&&hz<=high);
+  show('filter-value',center.toLocaleString()+' Hz');
+  show('filter-result','Illustrative bandwidth: '+Math.round(bandwidth)+' Hz. Harmonics inside: '+(inside.length?inside.join(', ')+' Hz':'none')+'.');
+});
+function drawPhase(sign) {
+  const ctx = canvas('phase-plot');
+  const tracks = [
+    ['Left tone', i => (sign !== 0) * tone(500, i / 32000)],
+    ['Right tone', i => sign * tone(500, i / 32000)],
+    ['Masker at both ears', i => .4 * Math.sin(i * .43) + .34 * Math.sin(i * 1.31)]
+  ];
+  tracks.forEach(([label, sample], index) => {
+    const y = 58 + index * 90;
+    ctx.fillText(label, 15, y - 23);
+    line(ctx, [[175,y],[690,y]], '#819995');
+    line(ctx, Array.from({length:513}, (_, i) => [175+i,y-25*sample(i)]), index === 2 ? '#a74617' : '#085d57');
+  });
+  show('phase-status', sign === 0 ? 'Noise alone. Neither ear receives the tone.' : sign > 0
+    ? 'M₀S₀: Tone peaks align across ears. The masker is identical at both ears.'
+    : 'M₀Sπ: Left tone peaks align with right tone troughs. The masker is still identical at both ears.');
+}
+drawPhase(1);
+$('bmld-form').onsubmit = event => {
+  event.preventDefault();
+  show('bmld-result', val('bmld-answer') === 11 ? 'Correct. The opposite-phase threshold is 11 dB lower.' :
+    'Try subtracting the lower threshold from the in-phase threshold.');
+};
+
+const orbitMap = $('azimuth-map');
+function orbitCues() { return locationCues(val('orbit-angle'), 2000); }
+function drawOrbit() {
+  const ctx = canvas('azimuth-map');
+  const angle = val('orbit-angle');
+  const rad = angle * Math.PI / 180;
+  ctx.strokeStyle = '#819995';
+  ctx.beginPath();
+  ctx.arc(240,190,125,0,2*Math.PI);
+  ctx.stroke();
+  point(ctx,240,190,'#123a3a',37);
+  point(ctx,203,190,'#123a3a',7);
+  point(ctx,277,190,'#123a3a',7);
+  line(ctx,[[229,160],[240,142],[251,160]],'#123a3a');
+  ctx.fillText('0° front',207,39);
+  ctx.fillText('180° back',199,352);
+  ctx.fillText('−90° left',21,195);
+  ctx.fillText('+90° right',385,195);
+  point(ctx,240+125*Math.sin(rad),190-125*Math.cos(rad),'#a74617',12);
+  const {microseconds,level} = orbitCues();
+  show('orbit-result', angle + '° · ' + (microseconds ? direction(microseconds) + ' ear leads by ' +
+    Math.abs(microseconds) + ' µs and is louder by ' + Math.abs(level) + ' dB' : 'Equal timing and level'));
+  if (!orbit) return;
+  const at = audio.currentTime;
+  orbit.delays[0].delayTime.setTargetAtTime(Math.max(0,microseconds)/1e6,at,.022);
+  orbit.delays[1].delayTime.setTargetAtTime(Math.max(0,-microseconds)/1e6,at,.022);
+  orbit.gains[0].gain.setTargetAtTime(db(-Math.max(0,level)),at,.022);
+  orbit.gains[1].gain.setTargetAtTime(db(Math.min(0,level)),at,.022);
+}
+bind(['orbit-angle'], drawOrbit);
+function orbitDrag(event) {
+  const rect = orbitMap.getBoundingClientRect();
+  const x = (event.clientX-rect.left)*480/rect.width-240;
+  const y = (event.clientY-rect.top)*380/rect.height-190;
+  if (Math.hypot(x,y) < 12) return;
+  $('orbit-angle').value = Math.round(Math.atan2(x,-y)*180/Math.PI);
+  drawOrbit();
+}
+orbitMap.onpointerdown = event => {
+  orbitMap.setPointerCapture(event.pointerId);
+  orbitDrag(event);
+};
+orbitMap.onpointermove = event => {
+  if (orbitMap.hasPointerCapture(event.pointerId)) orbitDrag(event);
+};
+function stopOrbit() {
+  if (!orbit) return;
+  orbit.source.stop();
+  orbit.merge.disconnect();
+  orbit = null;
+  $('orbit-start').disabled = false;
+}
+$('orbit-stop').onclick = stopOrbit;
+audioButton('orbit-start', async () => {
+  const context = await getAudio();
+  stopAudio();
+  const buffer = context.createBuffer(1,context.sampleRate*2,context.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i=0;i<data.length;i++) data[i]=(2*Math.random()-1)*.075*envelope(i/context.sampleRate,2,.006);
+  const source = context.createBufferSource();
+  const merge = context.createChannelMerger(2);
+  const delays = [context.createDelay(),context.createDelay()];
+  const gains = [context.createGain(),context.createGain()];
+  source.buffer = buffer;
+  source.loop = true;
+  delays.forEach((delay,index) => {
+    source.connect(delay);
+    delay.connect(gains[index]);
+    gains[index].connect(merge,0,index);
+  });
+  merge.connect(context.destination);
+  orbit = {source,merge,delays,gains};
+  drawOrbit();
+  source.start();
+  $('orbit-start').disabled = true;
+});
+
+const separations = [30,10,3];
+let maa;
+function maaButtons(answerEnabled) {
+  $('maa-left').disabled = !answerEnabled;
+  $('maa-right').disabled = !answerEnabled;
+}
+function maaTrial(level) {
+  maa = {level, direction: Math.random() < .5 ? -1 : 1};
+  maaButtons(false);
+  $('maa-play').disabled = false;
+  $('maa-next').disabled = true;
+  show('maa-next','Next angle');
+  show('maa-status','Comparison ' + (level+1) + ' of 3 · ' + separations[level] + '° separation');
+}
+maaTrial(0);
+$('maa-next').onclick = () => maaTrial((maa.level+1)%separations.length);
+function maaSample(time, settings, ear, phases) {
+  const lag = Math.max(0,ear*settings.microseconds)/1e6;
+  const shifted = time-lag;
+  const gain = db(-Math.max(0,ear*settings.level));
+  let sum=0;
+  for(let i=0;i<phases.length;i++) sum += tone(230+i*137,shifted+phases[i]/(230+i*137));
+  return .012 * sum * gain * envelope(shifted,.33);
+}
+const maaPhases = Array.from({length:20},(_,i)=>(i*i*.173)%1);
+audioButton('maa-play', async () => {
+  const round = maa;
+  if (!round) return;
+  const first = locationCues(0,2000);
+  const second = locationCues(separations[round.level]*round.direction,2000);
+  maaButtons(false);
+  const source = await renderAudio(1, t => {
+    const settings = t < .55 ? first : second;
+    const time = t < .55 ? t : t-.55;
+    return [maaSample(time,settings,1,maaPhases),maaSample(time,settings,-1,maaPhases)];
+  });
+  source.addEventListener('ended', () => {
+    if (maa === round && $('maa-play').disabled === false && source === maa.source) maaButtons(true);
+  }, {once:true});
+  round.source = source;
+});
+function maaAnswer(answer) {
+  maaButtons(false);
+  $('maa-play').disabled = true;
+  $('maa-next').disabled = false;
+  if (maa.level === separations.length-1) show('maa-next','Try again');
+  const side = maa.direction < 0 ? 'left' : 'right';
+  show('maa-status',(answer === maa.direction ? 'Correct. ' : '') + 'The second sound moved ' +
+    separations[maa.level] + '° to the ' + side + '.' +
+    (maa.level === separations.length-1 ? ' Which separation was hardest to hear?' : ''));
+}
+$('maa-left').onclick = () => maaAnswer(-1);
+$('maa-right').onclick = () => maaAnswer(1);
+
+function monoPair(firstHz, secondHz) {
+  return renderAudio(1.42,t => {
+    const second = t >= .75;
+    const offset = second ? t-.75 : t;
+    const sample = .07 * envelope(offset,.60) * tone(second ? secondHz : firstHz,offset);
+    return [sample,sample];
+  });
+}
+function scaleTone(relativeDb) {
+  return renderAudio(.67,t => {
+    const sample = .054 * db(relativeDb) * envelope(t,.65) * tone(1000,t);
+    return [sample,sample];
+  });
+}
+const scaleLevels = [-8,8,-3];
+const scaleRatings = [];
+audioButton('scale-reference', () => scaleTone(0));
+audioButton('scale-play', () => scaleTone(scaleLevels[scaleRatings.length]));
+$('scale-form').onsubmit = event => {
+  event.preventDefault();
+  if (scaleRatings.length >= scaleLevels.length || !$('scale-rating').value.trim()) return;
+  scaleRatings.push(val('scale-rating'));
+  $('scale-rating').value = '';
+  const completed = scaleRatings.length === scaleLevels.length;
+  $('scale-submit').disabled = completed;
+  $('scale-play').disabled = completed;
+  if (!completed) {
+    show('scale-play','Play comparison ' + 'ABC'[scaleRatings.length]);
+    show('scale-status','Rating recorded. Listen to the next comparison.');
+    return;
+  }
+  show('scale-status','Ratings and playback levels relative to the reference');
+  const results = document.createElement('ul');
+  scaleRatings.forEach((rating,index) => {
+    const row = document.createElement('li');
+    row.textContent = 'Comparison ' + 'ABC'[index] + ' · your rating ' + rating + ' · ' + scaleLevels[index] + ' dB';
+    results.append(row);
+  });
+  $('scale-results').replaceChildren(results);
+};
+$('scale-reset').onclick = () => {
+  scaleRatings.length = 0;
+  $('scale-rating').value = '';
+  $('scale-play').disabled = false;
+  $('scale-submit').disabled = false;
+  show('scale-play','Play comparison A');
+  show('scale-status','');
+  $('scale-results').replaceChildren();
+};
+
+const hiddenReferences = [523,285,642,370];
+let hiddenIndex = 0;
+bind(['hidden-hz'], () => show('hidden-value',val('hidden-hz') + ' Hz'));
+audioButton('hidden-pair', () => monoPair(hiddenReferences[hiddenIndex],val('hidden-hz')));
+$('hidden-check').onclick = () => show('hidden-result','Reference: ' + hiddenReferences[hiddenIndex] +
+  ' Hz. Your match: ' + val('hidden-hz') + ' Hz. Absolute error: ' + Math.abs(hiddenReferences[hiddenIndex]-val('hidden-hz')) + ' Hz.');
+$('hidden-next').onclick = () => {
+  hiddenIndex = (hiddenIndex+1)%hiddenReferences.length;
+  $('hidden-hz').value = 400;
+  show('hidden-value','400 Hz');
+  show('hidden-result','New reference ready.');
+};
+function playF0(parts) {
+  const complex = time => parts.reduce((sum, n) => sum + tone(160*n,time)/Math.sqrt(n),0);
+  return renderAudio(.9,t => {
+    const sample = .085 * envelope(t,.9) * complex(t);
+    return [sample,sample];
+  });
+}
+audioButton('with-f0', () => playF0([1,2,3,4]));
+audioButton('without-f0', () => playF0([2,3,4]));
+</script>
+</html>
